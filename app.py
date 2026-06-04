@@ -5,65 +5,183 @@ HTML_PAGE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Basic Monitoring App</title>
+    <title>Kubernetes Monitoring App</title>
+
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #0f172a;
-            color: white;
-            font-family: Arial, sans-serif;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+
+            background: linear-gradient(
+                135deg,
+                #0f172a,
+                #1e293b,
+                #0f766e
+            );
+
+            overflow: hidden;
         }
 
         .card {
-            background: #1e293b;
+            width: 600px;
             padding: 40px;
-            border-radius: 20px;
+            border-radius: 24px;
+
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
             text-align: center;
-            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 50px;
+
+            background: #0284c7;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
         h1 {
-            color: #38bdf8;
+            font-size: 36px;
             margin-bottom: 10px;
+            color: #ffffff;
         }
 
-        p {
-            font-size: 18px;
+        .version {
             color: #cbd5e1;
+            font-size: 18px;
+            margin-bottom: 25px;
         }
 
         .status {
-            margin-top: 20px;
-            padding: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
             background: #16a34a;
-            border-radius: 10px;
+            padding: 14px 24px;
+            border-radius: 12px;
+
             font-weight: bold;
+            font-size: 18px;
+
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.6);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(22, 163, 74, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+            }
+        }
+
+        .metrics {
+            margin-top: 30px;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .metric-label {
+            margin-top: 5px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
 
     <div class="card">
+
+        <div class="badge">
+            Kubernetes Dashboard
+        </div>
+
         <h1>🚀 Kubernetes Monitoring App</h1>
-        <p>Version 5 Successfully Deployed</p>
+
+        <div class="version">
+            Version 5 Successfully Deployed
+        </div>
 
         <div class="status">
             ✅ Application Running Healthy
         </div>
+
+        <div class="metrics">
+
+            <div class="metric">
+                <div class="metric-value">3</div>
+                <div class="metric-label">Pods</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Availability</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Errors</div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            Cluster Status: Operational • Ready for HPA Testing
+        </div>
+
     </div>
 
 </body>
 </html>
 """
 
+
 class AppHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-
         # Simulate slight processing delay (helps HPA testing)
         time.sleep(0.2)
 
@@ -73,9 +191,10 @@ class AppHandler(BaseHTTPRequestHandler):
 
         self.wfile.write(HTML_PAGE.encode())
 
+
 if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", 8000), AppHandler)
 
-    print("Server running on port 8000...")
+    print("🚀 Server running on port 8000...")
 
     server.serve_forever()
