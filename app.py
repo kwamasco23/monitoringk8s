@@ -209,14 +209,32 @@ setInterval(updateTime, 1000);
 class AppHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+        # Health check endpoint (useful for Kubernetes probes)
+        if self.path == "/health":
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"OK")
+            return
+
         # Simulate slight processing delay (helps HPA testing)
         time.sleep(0.2)
 
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Server", "Kubernetes-Monitoring-App")
         self.end_headers()
 
-        self.wfile.write(HTML_PAGE.encode())
+        self.wfile.write(HTML_PAGE.encode("utf-8"))
+
+    def log_message(self, format, *args):
+        """Custom request logging."""
+        print(
+            f"[{self.log_date_time_string()}] "
+            f"{self.client_address[0]} "
+            f"{self.command} {self.path}"
+        )
 
 
 if __name__ == "__main__":
