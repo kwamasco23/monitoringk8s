@@ -5,14 +5,12 @@ metadata:
   name: monitoring-service
 
 spec:
-
   type: NodePort
 
   selector:
     app: monitoring-app
 
   ports:
-
     - protocol: TCP
       port: 80
       targetPort: 8000

@@ -1,13 +1,32 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
-# Set working directory
+# Create a non-root application user
+RUN useradd \
+    --create-home \
+    --shell /usr/sbin/nologin \
+    appuser
+
 WORKDIR /app
 
-# Copy your app
+# Install Python dependencies
+COPY requirements.txt .
+
+RUN pip install \
+    --no-cache-dir \
+    -r requirements.txt
+
+# Verify critical dependencies during the image build
+RUN python -c "import psutil; import prometheus_client; print('Dependencies OK')"
+
+# Copy application
 COPY app.py .
 
-# Expose the port your app runs on
-EXPOSE 6001
+# Application ownership
+RUN chown -R appuser:appuser /app
 
-# Run the app
+# Run as non-root
+USER appuser
+
+EXPOSE 8000
+
 CMD ["python", "app.py"]

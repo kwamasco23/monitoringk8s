@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "kwamasco/basicmonitoringapp4k8s"
+        IMAGE = "kwamasco/monitoringk8s"
         TAG = "v${BUILD_NUMBER}"
     }
 
@@ -11,28 +11,32 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'master',
-                url: 'https://github.com/kwamasco23/basic-monitoring-app-k8s.git'
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE:$TAG ."
+                sh '''
+                    docker build -t $IMAGE:$TAG .
+                '''
             }
         }
 
         stage('Push Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'USER',
+                        passwordVariable: 'PASS'
+                    )
+                ]) {
 
                     sh '''
-                    echo $PASS | docker login -u $USER --password-stdin
-                    docker push $IMAGE:$TAG
+                        echo $PASS | docker login -u $USER --password-stdin
+                        docker push $IMAGE:$TAG
                     '''
                 }
             }
@@ -40,25 +44,27 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
+
                 sh '''
-                export KUBECONFIG=/var/lib/jenkins/kubeconfig
+                    export KUBECONFIG=/var/lib/jenkins/kubeconfig
 
-                /usr/local/bin/kubectl set image deployment/monitoring-app \
-                monitoring-app=$IMAGE:$TAG
+                    /usr/local/bin/kubectl set image deployment/monitoring-app \
+                    monitoring-app=$IMAGE:$TAG
 
-                /usr/local/bin/kubectl rollout status deployment/monitoring-app
+                    /usr/local/bin/kubectl rollout status deployment/monitoring-app
                 '''
             }
         }
     }
 
     post {
+
         success {
-            echo "✅ Deployment successful: $IMAGE:$TAG"
+            echo "Deployment successful: $IMAGE:$TAG"
         }
 
         failure {
-            echo "❌ Pipeline failed"
+            echo "Pipeline failed"
         }
     }
 }
