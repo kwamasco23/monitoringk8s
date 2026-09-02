@@ -48,6 +48,8 @@ pipeline {
                 sh '''
                     export KUBECONFIG=/var/lib/jenkins/kubeconfig
 
+                    /usr/local/bin/kubectl apply -f deployment.yaml
+
                     /usr/local/bin/kubectl set image deployment/monitoring-app \
                     monitoring-app=$IMAGE:$TAG
 
