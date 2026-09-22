@@ -33,7 +33,7 @@ spec:
 
           env:
             - name: APP_VERSION
-              value: "v5"
+              value: "v57"
 
           readinessProbe:
             httpGet:
