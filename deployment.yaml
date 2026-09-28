@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: monitoring-app
-          image: kwamasco/monitoringk8s:latest
+          image: kwamasco/monitoringk8s:v58
 
           ports:
             - containerPort: 8000
