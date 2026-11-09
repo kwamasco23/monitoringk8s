@@ -1,11 +1,11 @@
+
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: monitoring-app
-
+  namespace: default
 spec:
-  replicas: 3
+  replicas: 2
 
   strategy:
     type: RollingUpdate
@@ -25,7 +25,8 @@ spec:
     spec:
       containers:
         - name: monitoring-app
-          image: kwamasco/monitoringk8s:v58
+          image: kwamasco/monitoringk8s:v57
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 8000
